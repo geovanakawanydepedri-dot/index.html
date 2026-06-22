@@ -191,11 +191,22 @@
     <div id="tips-content"></div>
   </div>
 
-  <!-- CAMPO DE NOME -->
+  <!-- CAMPOS DE IDENTIFICAÇÃO -->
   <div class="section" style="border-left-color:#1a1a2e;">
     <div class="name-wrap">
-      <label data-i18n="name_label">Seu nome completo</label>
-      <input type="text" id="participant-name" data-i18n-placeholder="name_placeholder" placeholder="Digite seu nome antes de começar…">
+      <label id="label-email">Seu e-mail corporativo</label>
+      <input type="email" id="participant-name" placeholder="seu.email@mercadolivre.com" style="max-width:380px">
+    </div>
+    <div class="name-wrap" style="margin-top:16px">
+      <label id="label-country">País / Site</label>
+      <select id="participant-country" style="max-width:200px;padding:10px 14px;border:2px solid #e8e8e8;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer">
+        <option value="">-- Selecione --</option>
+        <option value="MLA">MLA — Argentina</option>
+        <option value="MLB">MLB — Brasil</option>
+        <option value="MLC">MLC — Chile</option>
+        <option value="MLU">MLU — Uruguay</option>
+        <option value="MLM">MLM — México</option>
+      </select>
     </div>
   </div>
 
@@ -974,14 +985,21 @@ function buildIntegrityBlock() {
 var SHEET_URL = 'https://script.google.com/a/macros/mercadolivre.com/s/AKfycbwjg8qZBKPgz-vrqXXJfWZAuIyfPqVBfLaZYODmdSO0Hej4I4VflMMTVWugYAjkWWKb/exec';
 
 function sendToSheet() {
-  var es   = currentLang === 'es';
-  var name = document.getElementById('participant-name').value.trim();
+  var es      = currentLang === 'es';
+  var email   = document.getElementById('participant-name').value.trim();
+  var country = document.getElementById('participant-country').value;
 
-  if (!name) {
-    alert(es ? 'Por favor ingresa tu nombre antes de enviar.' : 'Por favor informe seu nome antes de enviar.');
+  if (!email || !email.includes('@')) {
+    alert(es ? 'Por favor ingresa tu e-mail corporativo.' : 'Por favor informe seu e-mail corporativo.');
     document.getElementById('participant-name').focus();
     return;
   }
+  if (!country) {
+    alert(es ? 'Por favor selecciona tu país/site.' : 'Por favor selecione seu país/site.');
+    document.getElementById('participant-country').focus();
+    return;
+  }
+  var name = email; // mantém compatibilidade com o restante do código
 
   var btn   = document.getElementById('btn-copy');
   var label = document.getElementById('btn-copy-label');
@@ -992,7 +1010,8 @@ function sendToSheet() {
   var totalSecs = Math.round(totalMs / 1000);
 
   var params = new URLSearchParams({
-    name:     name,
+    name:     email,
+    country:  country,
     level:    finalLevel,
     score:    finalScore,
     total:    TOTAL_MAX,
